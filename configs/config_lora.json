@@ -1,6 +1,6 @@
 {
 
     "yangmi":"./data/yangmi_0821-000002.safetensors",
-    "baijingting":"./data/couple_0614_001-000001.safetensors"
-
+    "baijingting":"./data/couple_0614_001-000001.safetensors",
+    "id":"/mnt/2T/zwshi/model_zoo/035_mix-000008.safetensors"
 }

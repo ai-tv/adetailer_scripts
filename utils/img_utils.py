@@ -40,6 +40,12 @@ def mask_gen(image: Image.Image):
 
     return masks, [list(map(int, item)) for item in bboxs]
 
+def embedding_gen(image: Image.Image):
+    face = np.asarray(image)
+    face_info = app.get(face[..., ::-1])
+    face_embedding = face_info[0].normed_embedding
+    return face_embedding
+
 
 def bbox_padding(
         bbox: List[int], image_size: tuple[int, int], value: int = 32
