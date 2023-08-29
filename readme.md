@@ -25,6 +25,6 @@
 5. process images using pipelines
 6. unload loras
 ## Usage
-1. standard usage for adetailer without face feature was shown in test/test_standard.py
-2. specific usage for adetailer with face feature was shown in test/test_with_faceF.py
+1. standard usage for adetailer without face feature was shown in 'test/test_standard.py'
+2. specific usage for adetailer with face feature was shown in 'test/test_with_faceF.py'
 
