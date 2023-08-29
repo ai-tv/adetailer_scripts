@@ -43,8 +43,8 @@ def mask_gen(image: Image.Image):
 def embedding_gen(image: Image.Image):
     face = np.asarray(image)
     face_info = app.get(face[..., ::-1])
-    face_embedding = face_info[0].normed_embedding
-    return face_embedding
+    face_embedding = face_info[0].embedding
+    return face_embedding.reshape(1,-1)
 
 
 def bbox_padding(

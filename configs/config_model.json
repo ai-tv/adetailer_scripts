@@ -1,3 +1,5 @@
 {
-    "id_mlp": "./data/035_mix-000008.safetensors_mlp.pt"
+    "id_mlp": "/mnt/lg106/hou/model_data/other_model/035_mix-000008.safetensors_mlp.pt",
+    "local_base":"/home/hou/project/chilloutmix_NiPrunedFp32Fix"
+
 }

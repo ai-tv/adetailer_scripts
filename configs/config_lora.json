@@ -1,6 +1,6 @@
 {
 
-    "yangmi":"./data/yangmi_0821-000002.safetensors",
-    "baijingting":"./data/couple_0614_001-000001.safetensors",
-    "id":"./data/035_mix-000008.safetensors"
+    "yangmi":"/mnt/lg106/hou/model_data/lora_model/yangmi_0821-000002.safetensors",
+    "baijingting":"/mnt/lg106/hou/model_data/lora_model/couple_0614_001-000001.safetensors",
+    "id":"/mnt/lg106/hou/model_data/lora_model/035_mix-000008.safetensors"
 }
