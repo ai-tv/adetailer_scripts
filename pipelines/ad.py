@@ -21,6 +21,7 @@ from utils.lora_loader import LoraLoader
 from utils.long_prompt_weighting import get_weighted_text_embeddings
 
 
+
 class AdPipeline(AdPipelineBase, StableDiffusionPipeline):
 
     @cached_property
@@ -46,7 +47,7 @@ class PipelineKeeper:
         self.lock = Lock()
         self.config_lora = json.load(open("./configs/config_lora.json"))
         self.config_model = json.load(open("./configs/config_model.json"))
-        self.id_mlp = torch.load(self.config_model['id_mlp'])
+        self.id_mlp = torch.load(self.config_model['id_mlp']).to("cuda").eval()
 
     def init_pipeline(self, pipeline_num=2):
         SCHEDULER_LINEAR_START = 0.00085

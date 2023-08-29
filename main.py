@@ -7,6 +7,9 @@ from fastapi import FastAPI, Request, HTTPException
 from loguru import logger
 from pipelines.ad import PipelineKeeper
 from utils.decode import b64_pils, pils_b64
+import sys
+
+sys.path.append("D:/adetailer_scripts/networks")
 
 # step.1    先启动log
 logger.add("./log/process.log")

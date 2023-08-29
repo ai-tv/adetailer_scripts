@@ -1,3 +1,3 @@
 {
-    "id_mlp": "/mnt/lg102/zwshi/model_zoo/035_mix-000008.safetensors_mlp.pt"
+    "id_mlp": "./data/035_mix-000008.safetensors_mlp.pt"
 }
