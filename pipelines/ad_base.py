@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-import inspect
-import time
-from abc import ABC, abstractmethod
-from typing import Any, Callable, Iterable, List, Mapping, Optional
 
-from diffusers.utils import logging
+from abc import ABC, abstractmethod
+from typing import  Callable,List
+
+
 from PIL import Image
 from loguru import logger
 import numpy as np
 from utils.img_utils import bbox_padding, composite
 
 
-# logger.add("../log/process.log")
+logger.add("../log/process.log")
 
 
 def ordinal(n: int) -> str:

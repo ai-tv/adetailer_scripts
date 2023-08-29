@@ -1,33 +1,15 @@
-import inspect
 import re
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
-import numpy as np
-import PIL
 import torch
-from packaging import version
-from transformers import CLIPImageProcessor, CLIPTextModel, CLIPTokenizer
+
 
 from diffusers import DiffusionPipeline
-from diffusers.configuration_utils import FrozenDict
-from diffusers.image_processor import VaeImageProcessor
-from diffusers.loaders import FromSingleFileMixin, LoraLoaderMixin, TextualInversionLoaderMixin
-from diffusers.models import AutoencoderKL, UNet2DConditionModel
-from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput, StableDiffusionSafetyChecker
-from diffusers.schedulers import KarrasDiffusionSchedulers
-from diffusers.utils import (
-    PIL_INTERPOLATION,
-    deprecate,
-    is_accelerate_available,
-    is_accelerate_version,
-    logging,
-    randn_tensor,
-)
 
 
 # ------------------------------------------------------------------------------
 
-logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+# logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 re_attention = re.compile(
     r"""
@@ -187,7 +169,7 @@ def pad_tokens_and_weights(tokens, weights, max_length, bos, eos, pad, no_boseos
             else:
                 for j in range(max_embeddings_multiples):
                     w.append(1.0)  # weight for starting token in this chunk
-                    w += weights[i][j * (chunk_length - 2) : min(len(weights[i]), (j + 1) * (chunk_length - 2))]
+                    w += weights[i][j * (chunk_length - 2): min(len(weights[i]), (j + 1) * (chunk_length - 2))]
                     w.append(1.0)  # weight for ending token in this chunk
                 w += [1.0] * (weights_length - len(w))
             weights[i] = w[:]
@@ -196,10 +178,10 @@ def pad_tokens_and_weights(tokens, weights, max_length, bos, eos, pad, no_boseos
 
 
 def get_unweighted_text_embeddings(
-    pipe: DiffusionPipeline,
-    text_input: torch.Tensor,
-    chunk_length: int,
-    no_boseos_middle: Optional[bool] = True,
+        pipe: DiffusionPipeline,
+        text_input: torch.Tensor,
+        chunk_length: int,
+        no_boseos_middle: Optional[bool] = True,
 ):
     """
     When the length of tokens is a multiple of the capacity of the text encoder,
@@ -210,7 +192,7 @@ def get_unweighted_text_embeddings(
         text_embeddings = []
         for i in range(max_embeddings_multiples):
             # extract the i-th chunk
-            text_input_chunk = text_input[:, i * (chunk_length - 2) : (i + 1) * (chunk_length - 2) + 2].clone()
+            text_input_chunk = text_input[:, i * (chunk_length - 2): (i + 1) * (chunk_length - 2) + 2].clone()
 
             # cover the head and the tail by the starting and the ending tokens
             text_input_chunk[:, 0] = text_input[0, 0]
@@ -236,13 +218,13 @@ def get_unweighted_text_embeddings(
 
 
 def get_weighted_text_embeddings(
-    pipe: DiffusionPipeline,
-    prompt: Union[str, List[str]],
-    uncond_prompt: Optional[Union[str, List[str]]] = None,
-    max_embeddings_multiples: Optional[int] = 3,
-    no_boseos_middle: Optional[bool] = False,
-    skip_parsing: Optional[bool] = False,
-    skip_weighting: Optional[bool] = False,
+        pipe: DiffusionPipeline,
+        prompt: Union[str, List[str]],
+        uncond_prompt: Optional[Union[str, List[str]]] = None,
+        max_embeddings_multiples: Optional[int] = 3,
+        no_boseos_middle: Optional[bool] = False,
+        skip_parsing: Optional[bool] = False,
+        skip_weighting: Optional[bool] = False,
 ):
     r"""
     Prompts can be assigned with local weights using brackets. For example,
