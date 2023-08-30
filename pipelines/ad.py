@@ -96,6 +96,7 @@ class PipelineKeeper:
         bboxs = []
         for index, item in enumerate(images):
             ms, bs = mask_gen(item)
+            # 有可能会出现脸部检测缺失的问题，暂时的处理方案是如果数量对不上characters的数量,就将该照片移除infer队列
             masks.append(ms)
             bboxs.append(bs)
         input_images = images.copy()
@@ -122,8 +123,10 @@ class PipelineKeeper:
         bboxs = []
         for index, item in enumerate(images):
             ms, bs = mask_gen(item)
+            # 应该将检测不成功的图片记录到log中 TODO
             masks.append(ms)
             bboxs.append(bs)
+        # 需要检测当前的mask个数是否符合要求，不符合要求则取消该img的换脸操作 
         input_images = images.copy()
         for index, ref in enumerate(refs):
             p = self.get_pipelines()[0]

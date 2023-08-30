@@ -54,6 +54,12 @@ class AdPipelineBase(ABC):
 
             mask = masks[i][index]
             bbox = bboxs[i][index]
+            # 要是检测到mask有None，就是原图被检测出来的脸部数目对不上，放弃生成，直接返回原图
+            if mask == None:
+                final_images.append(init_image)
+                continue
+
+
             bbox_padded = bbox_padding(bbox, init_image.size, 64)
             bbox_padded = tuple(bbox_padded)
             crop_image = init_image.crop(bbox_padded)
@@ -83,7 +89,7 @@ class AdPipelineBase(ABC):
 
     def get_inpaint_args(self):
         return {
-            "strength": 0.5,
+            "strength": 0.45,
             "num_images_per_prompt": 1,
             "output_type": "pil",
             "num_inference_steps": 30,
