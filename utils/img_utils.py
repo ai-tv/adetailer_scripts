@@ -24,8 +24,9 @@ mask_blur = 7
 def mask_gen(image: Image.Image, detect_num = 2):
     image = np.asarray(image)
     face_info = app.get(image[..., ::-1])
-    face_info = filter(lambda x: x.det_score > 0.5, face_info)
-    face_info.sort(key=lambda x: (x.bbox[2]-x.bbox[0])*(x.bbox[3]-x.bbox[1]),reversed=True)[:detect_num]
+    face_info = list(filter(lambda x: x.det_score > 0.5, face_info))
+    face_info.sort(key=lambda x: (x.bbox[2]-x.bbox[0])*(x.bbox[3]-x.bbox[1]),reverse=True)
+    face_info = face_info[:detect_num]
     face_info.sort(key=lambda x: x.bbox[0])
     
 
@@ -34,6 +35,7 @@ def mask_gen(image: Image.Image, detect_num = 2):
 
     # 先判断检测出来的face_info数量是否达到detect_num
     if len(face_info)<detect_num:
+        print("mask capture failed")
         return [None,None],[None,None]
     else:
         for face in face_info:
