@@ -45,7 +45,7 @@ class AdPipelineBase(ABC):
             masks: List[Image.Image] = None,
             bboxs: List[np.ndarray] = None,
             index: int = 0,
-            
+            log_path: str =None
 
     ):
         # init_images = []
@@ -69,6 +69,8 @@ class AdPipelineBase(ABC):
             inpaint_args = self.get_inpaint_args()
             inpaint_args["image"] = crop_image
             inpaint_args["mask_image"] = crop_mask
+            crop_image.save(log_path+"/crop_{}_{}.jpg".format(i,index))
+            crop_mask.save(log_path+"/cropM_{}_{}.jpg".format(i,index))
             # inpaint_args["width"] = init_image.size[0]
             # inpaint_args["height"] = init_image.size[1]
             inpaint_args["prompt_embeds"] = prompt_embedding
@@ -77,6 +79,7 @@ class AdPipelineBase(ABC):
             # 将crop_image进行inpaint
             inpaint_output = self.inpaint_pipeline(**inpaint_args)
             inpaint_image: Image.Image = inpaint_output[0][0]
+            inpaint_image.save(log_path+"/inpaint_{}_{}.jpg".format(i,index))
             final_image = composite(
                 init=init_image,
                 mask=mask,

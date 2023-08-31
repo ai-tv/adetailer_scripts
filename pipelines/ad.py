@@ -126,6 +126,14 @@ class PipelineKeeper:
     def process_with_ref(self, images: List[Image.Image], refs: List[Image.Image]):
         prompt = "a photo of young thin face, good-looking, best quality"
         negative_prompt = "paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, glans, lowres,bad anatomy,bad hands, text, error, missing fingers,extra digit, fewer digits, cropped, worstquality, low quality, normal quality,jpegartifacts,signature, watermark, username,blurry,bad feet,cropped,poorly drawn hands,poorly drawn face,mutation,deformed,worst quality,low quality,normal quality,jpeg artifacts,watermark,extra fingers,fewer digits,extra limbs,extra arms,extra legs,malformed limbs,fused fingers,too many fingers,long neck,cross-eyed,mutated hands,polar lowres,bad body,bad proportions,gross proportions,text,error,missing fingers,missing arms,missing legs,extra digit,(nsfw:1.5), (sexy)"
+        p_log = {}
+        p_log['base model'] = "emilianJR/chilloutmix_NiPrunedFp32Fix"
+        p_log['lora'] = [self.config_lora["id"]]
+        p_log['prompts'] = prompt
+        p_log['negative_prompt'] = negative_prompt
+        p_log['error_info'] = []
+        p_log['ad'] = json.load(open("./configs/config_ad.json"))
+        
         self.load_lora_byconfig(["id"])
 
         text_embedding, uncond_embedding = get_weighted_text_embeddings(self.pipeline_repo[0], prompt, negative_prompt)
@@ -136,10 +144,13 @@ class PipelineKeeper:
         bboxs = []
         for index, item in enumerate(images):
             ms, bs = mask_gen(item)
-            # 应该将检测不成功的图片记录到log中 TODO
             masks.append(ms)
             bboxs.append(bs)
-        # 需要检测当前的mask个数是否符合要求，不符合要求则取消该img的换脸操作 
+        
+        for index,item  in enumerate(masks):
+            if item[0] == None:
+                p_log['error_info'].append(ordinal(index)+" image occurs mask gen error")
+
         input_images = images.copy()
         for index, ref in enumerate(refs):
             p = self.get_pipelines()[0]
@@ -151,7 +162,7 @@ class PipelineKeeper:
             re = p(prompt_embedding=con_embedding, negative_prompt_embedding=uncond_embedding, images=input_images,
                    masks=masks, bboxs=bboxs, index=index)
             input_images = re
-        return re
+        return re,p_log
 
     def unload_lora(self):
         for index, item in enumerate(self.lora_onload_keys):
