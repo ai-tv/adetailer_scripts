@@ -9,6 +9,7 @@ from PIL import Image
 from loguru import logger
 import numpy as np
 from utils.img_utils import bbox_padding, composite
+import json
 
 
 logger.add("../log/process.log")
@@ -44,6 +45,7 @@ class AdPipelineBase(ABC):
             masks: List[Image.Image] = None,
             bboxs: List[np.ndarray] = None,
             index: int = 0,
+            
 
     ):
         # init_images = []
@@ -60,7 +62,7 @@ class AdPipelineBase(ABC):
                 continue
 
 
-            bbox_padded = bbox_padding(bbox, init_image.size, 64)
+            bbox_padded = bbox_padding(bbox, init_image.size)
             bbox_padded = tuple(bbox_padded)
             crop_image = init_image.crop(bbox_padded)
             crop_mask = mask.crop(bbox_padded)
@@ -88,11 +90,6 @@ class AdPipelineBase(ABC):
         return final_images
 
     def get_inpaint_args(self):
-        return {
-            "strength": 0.45,
-            "num_images_per_prompt": 1,
-            "output_type": "pil",
-            "num_inference_steps": 30,
-            "width": 640,
-            "height": 640
-        }
+
+        config = json.load(open("./configs/config_ad.json"))
+        return config["inpaint_args"]

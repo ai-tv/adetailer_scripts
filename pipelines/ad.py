@@ -21,6 +21,10 @@ from utils.img_utils import mask_gen, embedding_gen
 from utils.lora_loader import LoraLoader
 from utils.long_prompt_weighting import get_weighted_text_embeddings
 
+def ordinal(n: int) -> str:
+    d = {1: "st", 2: "nd", 3: "rd"}
+    return str(n) + ("th" if 11 <= n % 100 <= 13 else d.get(n % 10, "th"))
+
 
 
 class AdPipeline(AdPipelineBase, StableDiffusionPipeline):
@@ -86,19 +90,28 @@ class PipelineKeeper:
         prompts = ["{}, master piece, detailed face".format(c) for c in characters]
         negative_prompt = "paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, glans, lowres,bad anatomy,bad hands, text, error, missing fingers,extra digit, fewer digits, cropped, worstquality, low quality, normal quality,jpegartifacts,signature, watermark, username,blurry,bad feet,cropped,poorly drawn hands,poorly drawn face,mutation,deformed,worst quality,low quality,normal quality,jpeg artifacts,watermark,extra fingers,fewer digits,extra limbs,extra arms,extra legs,malformed limbs,fused fingers,too many fingers,long neck,cross-eyed,mutated hands,polar lowres,bad body,bad proportions,gross proportions,text,error,missing fingers,missing arms,missing legs,extra digit,(nsfw:1.5), (sexy)"
         # lora_keys = []
+        p_log = {}
+        p_log['base model'] = "emilianJR/chilloutmix_NiPrunedFp32Fix"
+        p_log['lora'] = [self.config_lora[c] for c in characters]
+        p_log['prompts'] = prompts
+        p_log['negative_prompt'] = negative_prompt
+        p_log['error_info'] = []
+        p_log['ad'] = json.load(open("./configs/config_ad.json"))
 
-        # 先写死需要用的lora
         lora_keys = characters
         self.load_lora_byconfig(lora_keys)
+        
 
         # images生成masks和bboxs
         masks = []
         bboxs = []
         for index, item in enumerate(images):
             ms, bs = mask_gen(item)
-            # 有可能会出现脸部检测缺失的问题，暂时的处理方案是如果数量对不上characters的数量,就将该照片移除infer队列
             masks.append(ms)
             bboxs.append(bs)
+        for index,item  in enumerate(masks):
+            if item[0] == None:
+                p_log['error_info'].append(ordinal(index)+" image occurs mask gen error")
         input_images = images.copy()
 
         for index, prompt in enumerate(prompts):
@@ -108,7 +121,7 @@ class PipelineKeeper:
                    masks=masks, bboxs=bboxs, index=index)
             input_images = re
 
-        return re
+        return re, p_log
 
     def process_with_ref(self, images: List[Image.Image], refs: List[Image.Image]):
         prompt = "a photo of young thin face, good-looking, best quality"
@@ -151,3 +164,5 @@ class PipelineKeeper:
 
     def add_pipeline(self, pipeline: AdPipeline):
         self.pipeline_repo.append(pipeline)
+
+    
