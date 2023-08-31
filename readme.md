@@ -30,4 +30,5 @@
 ## afterward optimization
 [] log系统稍稍有点粗糙
 [] 根据引导图bbox应对mask生成bad case进行处理
+[] 增加同一角色不同lora切换的功能，根据request中给出的参数
 
