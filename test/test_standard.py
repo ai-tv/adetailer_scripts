@@ -11,20 +11,24 @@ from utils.decode import pils_b64
 import requests
 
 
+
 def test_post_app():
     images = []
     images.append(Image.open("../data/face2.jpg"))
     images.append(Image.open("../data/face3.jpg"))
     images.append(Image.open("../data/face8.png"))
+    guide_bboxs = [[["x1","y1","x2","y2"]]]
 
     # @params
     # characters:   图片上需要进行修脸的角色的姓名（从左到右）
     # images：      以b64 encoding的图片List
-    # traceID：     当前任务的traceID，作为log中的tag
+    # request_id：  当前任务的id，作为log中的tag
+    # guide_bboxs   List[bbox],举个例子，一张图片有两个bbox，有三张图片,list的size就是[3,2,4]
     obj = {
         "characters": ["baijingting", "yangmi"],
         "images": pils_b64(images),
-        "traceID": "1001"
+        "request_id": "1001",
+        "guide_bboxs": guide_bboxs, 
     }
 
     start = time.time()
