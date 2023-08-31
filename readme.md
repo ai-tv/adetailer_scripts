@@ -27,4 +27,7 @@
 ## Usage
 1. standard usage for adetailer without face feature was shown in `test/test_standard.py`
 2. specific usage for adetailer with face feature was shown in `test/test_with_faceF.py`
+## afterward optimization
+[] log系统稍稍有点粗糙
+[] 根据引导图bbox应对mask生成bad case进行处理
 
